@@ -1,26 +1,27 @@
-import React, { useEffect, useState } from "react";
+import { Box, Text, SimpleGrid } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { getAchievements } from "../services/api";
 
 export default function Achievements() {
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    getAchievements().then(r => setList(r.data || [])).catch(()=>setList([]));
+    getAchievements().then(r => setList(r.data || [])).catch(() => setList([]));
   }, []);
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold">Achievements</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-        {list.length === 0 && <div className="card-soft p-4">No achievements yet</div>}
+    <Box>
+      <Text fontSize="2xl" fontWeight="bold">Achievements</Text>
+
+      <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mt={4}>
+        {list.length === 0 && <Box p={4} bg="white" shadow="md" rounded="md">No achievements yet</Box>}
         {list.map(a => (
-          <div key={a._id} className="card-soft p-4 flex flex-col">
-            <strong className="text-sm">{a.title}</strong>
-            <p className="text-xs text-muted mt-1">{a.description}</p>
-            <small className="text-xs text-muted mt-2">{new Date(a.date).toLocaleDateString()}</small>
-          </div>
+          <Box key={a._id} p={4} bg="white" shadow="md" rounded="md">
+            <Text fontWeight="600">{a.title}</Text>
+            <Text fontSize="sm" color="gray.500">{a.description}</Text>
+          </Box>
         ))}
-      </div>
-    </div>
+      </SimpleGrid>
+    </Box>
   );
 }

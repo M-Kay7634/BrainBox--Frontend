@@ -1,44 +1,47 @@
-import React, { useEffect, useState } from "react";
+import { Box, Text, Select, VStack } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { getGlobalTop, getDailyTop } from "../services/api";
 
-export default function Leaderboard(){
-  const [global,setGlobal] = useState([]); const [daily,setDaily] = useState([]); const [game,setGame] = useState('');
+export default function Leaderboard() {
+  const [game, setGame] = useState("");
+  const [global, setGlobal] = useState([]);
+  const [daily, setDaily] = useState([]);
 
-  useEffect(()=>{ load(); }, [game]);
+  useEffect(() => {
+    load();
+  }, [game]);
 
   const load = async () => {
-    const g = await getGlobalTop(game).then(r=>r.data).catch(()=>[]);
-    const d = await getDailyTop(game).then(r=>r.data).catch(()=>[]);
-    setGlobal(g); setDaily(d);
+    setGlobal(await getGlobalTop(game).then(r=>r.data).catch(()=>[]));
+    setDaily(await getDailyTop(game).then(r=>r.data).catch(()=>[]));
   };
 
   return (
-    <div>
-      <div className="card-soft p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">Leaderboard</h1>
-          <select value={game} onChange={e=>setGame(e.target.value)} className="input input-bordered">
-            <option value="">All Games</option>
-            <option value="Memory Flip">Memory Flip</option>
-            <option value="Speed Math">Speed Math</option>
-          </select>
-        </div>
+    <Box pt="120px" maxW="900px" mx="auto" px={4}>
+      <Text fontSize="3xl" fontWeight="bold">Leaderboard</Text>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-semibold mb-2">Global Top</h3>
-            <ol className="list-decimal ml-5">
-              {global.map(s=> <li key={s._id} className="py-1">{s.playerName||'Guest'} — {s.score} <small className="text-muted">({new Date(s.date).toLocaleString()})</small></li>)}
-            </ol>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Today's Top</h3>
-            <ol className="list-decimal ml-5">
-              {daily.map(s=> <li key={s._id} className="py-1">{s.playerName||'Guest'} — {s.score} <small className="text-muted">({new Date(s.date).toLocaleTimeString()})</small></li>)}
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Select mt={4} value={game} onChange={e=>setGame(e.target.value)}>
+        <option value="">All Games</option>
+        <option value="Memory Flip">Memory Flip</option>
+        <option value="Speed Math">Speed Math</option>
+      </Select>
+
+      <VStack align="stretch" mt={6} spacing={6}>
+        <Box bg="white" p={5} rounded="md" shadow="md">
+          <Text fontSize="xl" fontWeight="600" mb={3}>Global Top</Text>
+          {global.map((item,i)=>(
+            <Text key={i}>{i+1}. {item.playerName} — {item.score}</Text>
+          ))}
+        </Box>
+
+        <Box bg="white" p={5} rounded="md" shadow="md">
+          <Text fontSize="xl" fontWeight="600" mb={3}>Today's Top</Text>
+          {daily.map((item,i)=>(
+            <Text key={i}>{i+1}. {item.playerName} — {item.score}</Text>
+          ))}
+        </Box>
+      </VStack>
+
+    </Box>
   );
 }

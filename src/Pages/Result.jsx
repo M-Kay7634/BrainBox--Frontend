@@ -1,19 +1,24 @@
-import { useLocation, Link } from 'react-router-dom';
+import { Box, Text, Button, Flex } from "@chakra-ui/react";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Result() {
   const { state } = useLocation();
-  if (!state) return (
-    <div style={{ padding: 20 }}>No result data. <Link to='/'>Back</Link></div>
-  );
-  const { score, moves, game, timeTaken } = state;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Result - {game}</h1>
-      <p>Score: {score}</p>
-      {moves !== null && <p>Moves/Answers: {moves}</p>}
-      {timeTaken !== undefined && <p>Time taken: {timeTaken}s</p>}
-      <Link to='/'><button>Back to Dashboard</button></Link>
-    </div>
+    <Box pt="120px" maxW="600px" mx="auto" textAlign="center">
+      <Box bg="white" p={8} rounded="lg" shadow="xl">
+        <Text fontSize="3xl" fontWeight="bold">Your Result</Text>
+        <Text fontSize="5xl" color="purple.600" mt={4}>{state?.score}</Text>
+
+        <Flex justify="center" gap={4} mt={6}>
+          <Link to="/">
+            <Button colorScheme="purple">Play Again</Button>
+          </Link>
+          <Link to="/profile">
+            <Button variant="outline">View Profile</Button>
+          </Link>
+        </Flex>
+      </Box>
+    </Box>
   );
 }

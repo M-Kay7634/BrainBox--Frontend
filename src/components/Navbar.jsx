@@ -1,72 +1,102 @@
-import React, { useState } from "react";
+import {
+  Box,
+  Flex,
+  HStack,
+  Button,
+  IconButton,
+  Text,
+  useColorMode,
+  useDisclosure
+} from "@chakra-ui/react";
+import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { getToken, removeToken } from "../utils/auth";
 import { motion } from "framer-motion";
+import { useState } from "react";
+
+const MotionBox = motion(Box);
 
 export default function Navbar() {
-  const token = getToken();
-  const [open, setOpen] = useState(false);
+  const [hide, setHide] = useState(false);
+  const { isOpen, onToggle } = useDisclosure();
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  if (hide) return null; // completely hides navbar
 
   return (
-    <motion.header
+    <MotionBox
+      position="fixed"
+      top="0"
+      left="0"
+      width="100%"
+      bg="white"
+      _dark={{ bg: "gray.800" }}
+      boxShadow="sm"
+      zIndex="1000"
+      py={3}
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.35 }}
-      className="w-full fixed top-0 left-0 z-40 backdrop-blur-sm"
     >
-      <div className="container-max flex items-center justify-between gap-4 py-4">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="text-xl font-bold text-primary">IQPlay</Link>
-          <nav className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
-            <Link to="/leaderboard" className="opacity-80 hover:opacity-100">Leaderboard</Link>
-          </nav>
-        </div>
+      <Flex
+        maxW="1200px"
+        mx="auto"
+        alignItems="center"
+        justifyContent="space-between"
+        px={6}
+      >
+        {/* LOGO */}
+        <Link to="/">
+          <Text fontSize="2xl" fontWeight="bold" color="purple.500" cursor="pointer">
+            BrainBox
+          </Text>
+        </Link>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2">
-            {token ? (
-              <>
-                <Link to="/profile" className="px-3 py-1 rounded-lg bg-primary text-white text-sm flex items-center gap-2">
-                  <UserCircleIcon className="w-5 h-5" /> Profile
-                </Link>
-                <button onClick={() => { removeToken(); window.location.href = "/"; }} 
-                        className="px-3 py-1 border rounded-lg text-sm">Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="px-3 py-1 border rounded-lg text-sm">Login</Link>
-                <Link to="/signup" className="px-3 py-1 bg-accent text-white rounded-lg text-sm">Signup</Link>
-              </>
-            )}
-          </div>
+        {/* Desktop Menu */}
+        <HStack spacing={5} display={{ base: "none", md: "flex" }}>
+          <Link to="/leaderboard">Leaderboard</Link>
 
-          {/* mobile menu */}
-          <button onClick={() => setOpen(o => !o)} className="md:hidden p-2 rounded-lg border">
-            {!open ? <Bars3Icon className="w-6 h-6" /> : <XMarkIcon className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
+          <Link to="/login">
+            <Button size="sm" variant="ghost">Login</Button>
+          </Link>
 
-      {/* Mobile drawer */}
-      {open && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="md:hidden bg-white shadow-md">
-          <div className="p-4 flex flex-col gap-3">
-            <Link to="/leaderboard" onClick={() => setOpen(false)}>Leaderboard</Link>
-            {token ? (
-              <>
-                <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
-                <button onClick={() => { removeToken(); window.location.href = "/"; }} className="text-left">Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
-                <Link to="/signup" onClick={() => setOpen(false)}>Signup</Link>
-              </>
-            )}
-          </div>
-        </motion.div>
+          <Link to="/signup">
+            <Button size="sm" colorScheme="purple">Signup</Button>
+          </Link>
+
+          {/* Dark/Light Toggle */}
+          <IconButton
+            size="sm"
+            icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+            onClick={toggleColorMode}
+          />
+
+          {/* Hide Navbar Button */}
+          <Button size="sm" onClick={() => setHide(true)} variant="outline">
+            Hide Nav
+          </Button>
+        </HStack>
+
+        {/* Mobile Menu Icon */}
+        <IconButton
+          display={{ base: "flex", md: "none" }}
+          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+          onClick={onToggle}
+        />
+      </Flex>
+
+      {/* Mobile Dropdown */}
+      {isOpen && (
+        <Box bg="white" _dark={{ bg: "gray.800" }} p={4} display={{ md: "none" }}>
+          <Link to="/leaderboard"><Text py={2}>Leaderboard</Text></Link>
+          <Link to="/login"><Text py={2}>Login</Text></Link>
+          <Link to="/signup"><Text py={2}>Signup</Text></Link>
+          <Button w="100%" mt={2} onClick={toggleColorMode}>
+            {colorMode === "light" ? "Dark Mode" : "Light Mode"}
+          </Button>
+          <Button w="100%" mt={2} variant="outline" onClick={() => setHide(true)}>
+            Hide Navbar
+          </Button>
+        </Box>
       )}
-    </motion.header>
+    </MotionBox>
   );
 }
