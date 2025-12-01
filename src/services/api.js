@@ -26,5 +26,8 @@ export const login = (payload) => API.post('/auth/login', payload);
 
 export const getUserScores = () => API.get('/scores/user');
 export const getAchievements = () => API.get('/achievements/me');
+export const getProfileSummary = () => API.get("/profile/summary");
+export const getProfileHistory = () => API.get("/profile/history");
+export const getUserStreak = () => API.get("/profile/streak");
 
 export default API;

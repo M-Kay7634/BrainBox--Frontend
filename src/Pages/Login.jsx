@@ -1,45 +1,81 @@
-import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
-import { useState } from "react";
-import { login } from "../services/api";
-import { saveToken } from "../utils/auth";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Stack,
+  Heading,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const [email,setEmail] = useState('');
-  const [password,setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const toast = useToast();
   const navigate = useNavigate();
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const { login } = useAuth(); // 🔥 Auth Context
+
+  const handleLogin = async () => {
     try {
-      const res = await login({email,password});
-      saveToken(res.data.token);
-      navigate("/");
-    } catch {
-      alert("Login failed");
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      // Backend returns token + user
+      const { token, user } = res.data;
+
+      // 🔥 save in global AuthContext
+      login(token, user);
+
+      toast({
+        title: "Login Successful",
+        status: "success",
+        duration: 2000,
+      });
+
+      navigate("/profile"); // redirect
+    } catch (err) {
+      toast({
+        title: "Invalid credentials",
+        status: "error",
+        duration: 2000,
+      });
+      console.log(err);
     }
   };
 
   return (
-    <Box pt="120px" maxW="400px" mx="auto">
-      <Box p={8} bg="white" shadow="lg" rounded="xl">
-        <Text fontSize="3xl" fontWeight="bold" mb={4}>Login</Text>
+    <Box maxW="400px" mx="auto" mt="120px" p={6}>
+      <Heading mb={4}>Login</Heading>
 
-        <form onSubmit={submit}>
-          <VStack spacing={4}>
-            <Input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-            <Input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <Stack spacing={4}>
+        <Input
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-            <Button w="100%" colorScheme="purple" type="submit">
-              Login
-            </Button>
+        <Input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-            <Text fontSize="sm">
-              Don't have an account? <Link to="/signup" style={{color: "#6B46C1"}}>Signup</Link>
-            </Text>
-          </VStack>
-        </form>
-      </Box>
+        <Button colorScheme="purple" onClick={handleLogin}>
+          Login
+        </Button>
+
+        <Text textAlign="center" fontSize="sm">
+          Don’t have an account? <a href="/signup">Signup</a>
+        </Text>
+      </Stack>
     </Box>
   );
 }

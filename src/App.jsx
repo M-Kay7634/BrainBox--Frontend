@@ -11,7 +11,6 @@ import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
 import TestTailwind from "./TestTailwind";
 
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -31,7 +30,6 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/test" element={<TestTailwind />} />
           </Routes>
         </main>
       </div>

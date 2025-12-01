@@ -6,12 +6,13 @@ import {
   IconButton,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";   // 🔥 auth context
 
 const MotionBox = motion(Box);
 
@@ -20,7 +21,9 @@ export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
 
-  if (hide) return null; // completely hides navbar
+  const { isLoggedIn, user, logout } = useAuth(); // 🔥 from context
+
+  if (hide) return null;
 
   return (
     <MotionBox
@@ -45,7 +48,12 @@ export default function Navbar() {
       >
         {/* LOGO */}
         <Link to="/">
-          <Text fontSize="2xl" fontWeight="bold" color="purple.500" cursor="pointer">
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            color="purple.500"
+            cursor="pointer"
+          >
             BrainBox
           </Text>
         </Link>
@@ -54,13 +62,37 @@ export default function Navbar() {
         <HStack spacing={5} display={{ base: "none", md: "flex" }}>
           <Link to="/leaderboard">Leaderboard</Link>
 
-          <Link to="/login">
-            <Button size="sm" variant="ghost">Login</Button>
-          </Link>
+          {/* 🔥 if NOT logged in */}
+          {!isLoggedIn && (
+            <>
+              <Link to="/login">
+                <Button size="sm" variant="ghost">
+                  Login
+                </Button>
+              </Link>
 
-          <Link to="/signup">
-            <Button size="sm" colorScheme="purple">Signup</Button>
-          </Link>
+              <Link to="/signup">
+                <Button size="sm" colorScheme="purple">
+                  Signup
+                </Button>
+              </Link>
+            </>
+          )}
+
+          {/* 🔥 if logged in */}
+          {isLoggedIn && (
+            <>
+              <Link to="/profile">
+                <Button size="sm" colorScheme="purple" variant="solid">
+                  {user?.name ? `Hi, ${user.name}` : "Profile"}
+                </Button>
+              </Link>
+
+              <Button size="sm" colorScheme="red" onClick={logout}>
+                Logout
+              </Button>
+            </>
+          )}
 
           {/* Dark/Light Toggle */}
           <IconButton
@@ -83,16 +115,46 @@ export default function Navbar() {
         />
       </Flex>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Menu Content */}
       {isOpen && (
         <Box bg="white" _dark={{ bg: "gray.800" }} p={4} display={{ md: "none" }}>
-          <Link to="/leaderboard"><Text py={2}>Leaderboard</Text></Link>
-          <Link to="/login"><Text py={2}>Login</Text></Link>
-          <Link to="/signup"><Text py={2}>Signup</Text></Link>
+          <Link to="/leaderboard">
+            <Text py={2}>Leaderboard</Text>
+          </Link>
+
+          {!isLoggedIn && (
+            <>
+              <Link to="/login">
+                <Text py={2}>Login</Text>
+              </Link>
+              <Link to="/signup">
+                <Text py={2}>Signup</Text>
+              </Link>
+            </>
+          )}
+
+          {isLoggedIn && (
+            <>
+              <Link to="/profile">
+                <Text py={2}>Profile</Text>
+              </Link>
+
+              <Button w="100%" colorScheme="red" mt={2} onClick={logout}>
+                Logout
+              </Button>
+            </>
+          )}
+
           <Button w="100%" mt={2} onClick={toggleColorMode}>
             {colorMode === "light" ? "Dark Mode" : "Light Mode"}
           </Button>
-          <Button w="100%" mt={2} variant="outline" onClick={() => setHide(true)}>
+
+          <Button
+            w="100%"
+            mt={2}
+            variant="outline"
+            onClick={() => setHide(true)}
+          >
             Hide Navbar
           </Button>
         </Box>
