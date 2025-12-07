@@ -8,10 +8,12 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {setAuthToken} from '../services/api';
+
+// 🔥 Import the correct API login function
+import { login as loginAPI, setAuthToken } from "../services/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,19 +21,15 @@ export default function Login() {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const { login } = useAuth(); // 🔥 Auth Context
+  const { login } = useAuth(); // Auth context handler
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-      });
+      const res = await loginAPI({ email, password });
 
-      // Backend returns token + user
       const { token, user } = res.data;
 
-      // 🔥 save in global AuthContext
+      // Save token globally
       setAuthToken(token);
       login(token, user);
 
@@ -41,7 +39,7 @@ export default function Login() {
         duration: 2000,
       });
 
-      navigate("/profile"); // redirect
+      navigate("/profile");
     } catch (err) {
       toast({
         title: "Invalid credentials",

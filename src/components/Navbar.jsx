@@ -12,7 +12,7 @@ import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";   // 🔥 auth context
+import { useAuth } from "../context/AuthContext";
 
 const MotionBox = motion(Box);
 
@@ -21,23 +21,22 @@ export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { isLoggedIn, user, logout } = useAuth(); // 🔥 from context
+  // ⭐ Now including loadingAuth
+  const { isLoggedIn, user, logout, loadingAuth } = useAuth();
+
+  // ⭐ FIX: Prevent incorrect UI before auth loads
+  if (loadingAuth) return null;
 
   // Floating button to restore navbar when hidden
   if (hide) {
     return (
       <Box position="fixed" top="10px" left="10px" zIndex="2000">
-        <Button
-          size="sm"
-          colorScheme="purple"
-          onClick={() => setHide(false)}
-        >
+        <Button size="sm" colorScheme="purple" onClick={() => setHide(false)}>
           Show Nav
         </Button>
       </Box>
     );
   }
-
 
   return (
     <MotionBox
@@ -76,7 +75,7 @@ export default function Navbar() {
         <HStack spacing={5} display={{ base: "none", md: "flex" }}>
           <Link to="/leaderboard">Leaderboard</Link>
 
-          {/* 🔥 if NOT logged in */}
+          {/* ⭐ If NOT logged in */}
           {!isLoggedIn && (
             <>
               <Link to="/login">
@@ -93,7 +92,7 @@ export default function Navbar() {
             </>
           )}
 
-          {/* 🔥 if logged in */}
+          {/* ⭐ If logged in */}
           {isLoggedIn && (
             <>
               <Link to="/profile">
@@ -108,24 +107,20 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Dark/Light Toggle */}
+          {/* Theme Toggle */}
           <IconButton
             size="sm"
             icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}
           />
 
-          {/* Hide Navbar Button */}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setHide(true)}
-          >
+          {/* Hide Navbar */}
+          <Button size="sm" variant="outline" onClick={() => setHide(true)}>
             Hide Nav
           </Button>
         </HStack>
 
-        {/* Mobile Menu Icon */}
+        {/* Mobile Menu Button */}
         <IconButton
           display={{ base: "flex", md: "none" }}
           icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -133,7 +128,7 @@ export default function Navbar() {
         />
       </Flex>
 
-      {/* Mobile Menu Content */}
+      {/* Mobile Menu */}
       {isOpen && (
         <Box bg="white" _dark={{ bg: "gray.800" }} p={4} display={{ md: "none" }}>
           <Link to="/leaderboard">
@@ -167,12 +162,7 @@ export default function Navbar() {
             {colorMode === "light" ? "Dark Mode" : "Light Mode"}
           </Button>
 
-          <Button
-            w="100%"
-            mt={2}
-            variant="outline"
-            onClick={() => setHide(true)}
-          >
+          <Button w="100%" mt={2} variant="outline" onClick={() => setHide(true)}>
             Hide Navbar
           </Button>
         </Box>
