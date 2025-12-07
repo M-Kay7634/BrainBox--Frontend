@@ -23,7 +23,21 @@ export default function Navbar() {
 
   const { isLoggedIn, user, logout } = useAuth(); // 🔥 from context
 
-  if (hide) return null;
+  // Floating button to restore navbar when hidden
+  if (hide) {
+    return (
+      <Box position="fixed" top="10px" left="10px" zIndex="2000">
+        <Button
+          size="sm"
+          colorScheme="purple"
+          onClick={() => setHide(false)}
+        >
+          Show Nav
+        </Button>
+      </Box>
+    );
+  }
+
 
   return (
     <MotionBox
@@ -102,7 +116,11 @@ export default function Navbar() {
           />
 
           {/* Hide Navbar Button */}
-          <Button size="sm" onClick={() => setHide(true)} variant="outline">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setHide(true)}
+          >
             Hide Nav
           </Button>
         </HStack>

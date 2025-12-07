@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { setAuthToken } from "../services/api";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -11,6 +12,7 @@ export function AuthProvider({ children }) {
   // Auto-login using saved token
   useEffect(() => {
     if (token) {
+      setAuthToken(token);
       axios
         .get("http://localhost:5000/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },

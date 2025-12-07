@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import {setAuthToken} from '../services/api';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export default function Login() {
       const { token, user } = res.data;
 
       // 🔥 save in global AuthContext
+      setAuthToken(token);
       login(token, user);
 
       toast({

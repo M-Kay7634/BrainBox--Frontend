@@ -179,7 +179,7 @@ export default function MemoryGame() {
       {/* TOP BAR: Level selection */}
       <Box
         position="fixed"
-        top={0}
+        top={50}
         left={0}
         right={0}
         bg="white"

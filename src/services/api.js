@@ -29,5 +29,6 @@ export const getAchievements = () => API.get('/achievements/me');
 export const getProfileSummary = () => API.get("/profile/summary");
 export const getProfileHistory = () => API.get("/profile/history");
 export const getUserStreak = () => API.get("/profile/streak");
+export const getHeatmap = () => API.get("/profile/heatmap");
 
 export default API;

@@ -35,6 +35,8 @@ import {
   getProfileHistory,
   getUserStreak,
 } from "../services/api";
+import ProfileHeatmap from "../components/ProfileHeatmap";
+import { getHeatmap } from "../services/api";
 
 // Small reusable card wrapper
 const SectionCard = ({ title, children }) => {
@@ -51,30 +53,36 @@ const SectionCard = ({ title, children }) => {
   );
 };
 
+
+
 export default function Profile() {
   const [summary, setSummary] = useState(null);
   const [history, setHistory] = useState([]);
   const [streakData, setStreakData] = useState(null);
+  const [heatmap, setHeatmap] = useState({});
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const load = async () => {
-      try {
-        const [sumRes, histRes, streakRes] = await Promise.all([
-          getProfileSummary(),
-          getProfileHistory(),
-          getUserStreak(),
-        ]);
+    try {
+      const [sumRes, histRes, streakRes, heatRes] = await Promise.all([
+        getProfileSummary(),
+        getProfileHistory(),
+        getUserStreak(),
+        getHeatmap(),
+      ]);
 
-        setSummary(sumRes.data || {});
-        setHistory(histRes.data || []);
-        setStreakData(streakRes.data || {});
-      } catch (err) {
-        console.error("Profile load failed", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setSummary(sumRes.data || {});
+      setHistory(histRes.data || []);
+      setStreakData(streakRes.data || {});
+      setHeatmap(heatRes.data || {});
+    } catch (err) {
+      console.error("Profile load failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     load();
   }, []);
@@ -87,17 +95,19 @@ export default function Profile() {
     );
   }
 
-  // History → chart data (latest 10 scores, reversed)
-  const chartData = history
-    .slice()
-    .reverse()
+  // Always get the latest 10 scores (newest first)
+  const latest = history
+    .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
     .slice(0, 10)
-    .map((h, idx) => ({
-      index: idx + 1,
-      score: h.score,
-      timeTaken: h.timeTaken,
-      label: new Date(h.date || h.createdAt).toLocaleDateString(),
-    }));
+    .reverse();   // oldest → newest for chart
+
+  const chartData = latest.map((h, idx) => ({
+    index: idx + 1,
+    score: h.score,
+    timeTaken: h.timeTaken,
+    label: new Date(h.date || h.createdAt).toLocaleDateString(),
+  }));
+
 
   const totalGames = summary?.totalGames || 0;
   const bestScore = summary?.bestScore || 0;
@@ -214,7 +224,7 @@ export default function Profile() {
           )}
         </SectionCard>
 
-        <SectionCard title="Recent Activity">
+        {/* <SectionCard title="Recent Activity">
           {streakData?.recentDays?.length ? (
             <Box>
               <Text fontSize="sm" color="gray.500" mb={2}>
@@ -231,6 +241,15 @@ export default function Profile() {
           ) : (
             <Text color="gray.500">No recent activity.</Text>
           )}
+        </SectionCard> */}
+
+        <SectionCard title="Activity Heatmap">
+          <Box mt={10}>
+            <ProfileHeatmap 
+              data={heatmap} 
+              totalActive={summary.totalGames}
+              maxStreak={streakData.longestStreak} />
+          </Box>
         </SectionCard>
       </SimpleGrid>
 

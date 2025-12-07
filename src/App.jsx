@@ -9,7 +9,17 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
-import TestTailwind from "./TestTailwind";
+import ReactionTime from "./games/ReactionTime";
+import OddOneOut from "./games/OddOneOut";
+import VerbalMemory from "./games/VerbalMemory";
+import PatternSequence from "./games/PatternSequence";
+import MentalRotation from "./games/MentalRotation";
+import TowerOfHanoi from "./games/TowerOfHanoi";
+import LightsOut from "./games/LightsOut";
+
+
+
+
 
 export default function App() {
   return (
@@ -30,6 +40,16 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/game/reaction" element={<ReactionTime />} />
+            <Route path="/game/odd-one-out" element={<OddOneOut />} />
+            <Route path="/game/verbal" element={<VerbalMemory />} />
+            <Route path="/game/pattern" element={<PatternSequence />} />
+            <Route path="/game/mental-rotation" element={<MentalRotation />} />
+            <Route path="/games/tower-of-hanoi" element={<TowerOfHanoi />} />
+            <Route path="/games/lights-out" element={<LightsOut />} />
+
+
+
           </Routes>
         </main>
       </div>
